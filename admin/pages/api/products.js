@@ -9,10 +9,11 @@ export default async function handler(req, res) {
     const product = await Product.create({ title, price, description });
     res.json({ message: "Product Added...", data: product });
   } else if (method === "GET") {
-    if (req.query?.id) {
-      res.json(await Product.findOne({ _id: req.query.id }));
+    if(req.query?.id){
+      res.json(await Product.findOne({ _id : req.query.id }))
     } else {
       res.json(await Product.find());
     }
+    
   }
 }

@@ -7,10 +7,14 @@ import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/router";
 
-const ProductForm = () => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
+const ProductForm = ({
+  title: existTitle,
+  description: existDescription,
+  price: existPrice,
+}) => {
+  const [title, setTitle] = useState(existTitle || "");
+  const [description, setDescription] = useState(existDescription || "");
+  const [price, setPrice] = useState(existPrice || "");
   const router = useRouter();
 
   const createProduct = async (e) => {
@@ -19,7 +23,7 @@ const ProductForm = () => {
     const res = await axios.post("/api/products", data);
     if (res.status === 200) {
       toast.success(res.message);
-      router.push('/products')
+      router.push("/products");
     }
   };
   return (
