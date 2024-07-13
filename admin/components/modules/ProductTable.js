@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Pencil , Trash2 } from 'lucide-react';
 import Link from "next/link";
+import { ProductDeletingModal } from "./ProductDeletingModal";
 
 export default function ProductTable({ products }) {
   console.log(products);
@@ -34,13 +35,7 @@ export default function ProductTable({ products }) {
                     <Pencil width={15}/>
                   Edit
                 </Link>
-                <Link
-                  href={`/products/${data._id}`}
-                  className="w-[50%] flex items-center gap-2 justify-center bg-rose-600 text-white p-3 rounded-lg hover:bg-rose-700 transition duration-200"
-                >
-                    <Trash2 />
-                  Delete
-                </Link>
+                <ProductDeletingModal data={data}/>
               </div>
             </TableCell>
           </TableRow>

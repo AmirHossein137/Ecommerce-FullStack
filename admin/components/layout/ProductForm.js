@@ -8,6 +8,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 
 const ProductForm = ({
+  _id,
   title: existTitle,
   description: existDescription,
   price: existPrice,
@@ -20,9 +21,11 @@ const ProductForm = ({
   const createProduct = async (e) => {
     e.preventDefault();
     const data = { title, description, price };
-    const res = await axios.post("/api/products", data);
-    if (res.status === 200) {
-      toast.success(res.message);
+    if (_id) {
+      await axios.put("/api/products/", { ...data, _id });
+        router.push("/products");
+    } else {
+      await axios.post("/api/products", data);
       router.push("/products");
     }
   };
