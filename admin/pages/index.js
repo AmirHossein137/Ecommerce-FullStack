@@ -1,31 +1,18 @@
-import { Button } from "@/components/ui/button";
-import { signIn, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import { Hand } from 'lucide-react';
+
 
 export default function Home() {
-  const signInHandler = () => {
-    signIn("github");
-  };
-
-  const signoutHandler = () => {
-    signOut();
-  };
-
+  const {data :session} = useSession()
+  console.log(session)
+  if(!session) return;
   return (
-    <div className="bg-cyan-900 w-full h-screen flex items-center justify-center">
-      <div className="text-center flex items-center justify-center gap-3 w-full">
-        <Button
-          className="bg-white p-5 text-slate-950 hover:bg-gray-200 transition duration-300"
-          onClick={signInHandler}
-        >
-          Login With GutHub
-        </Button>
-        <Button
-          className="bg-white p-5 text-slate-950 hover:bg-gray-200 transition duration-300"
-          onClick={signoutHandler}
-        >
-          SignOut
-        </Button>
+    <div className="text-slate-800 flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <Hand />
+        Hello,
       </div>
+      <span className="font-bold text-lg text-slate-800">{ session.user.email }</span>
     </div>
-  );
+  )
 }
