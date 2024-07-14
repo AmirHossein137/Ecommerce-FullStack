@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.4.1",
+    "@aws-sdk/client-s3": "^3.614.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
@@ -18,9 +19,12 @@
     "clsx": "^2.1.1",
     "eslint": "9.6.0",
     "eslint-config-next": "14.2.5",
+    "fs": "^0.0.1-security",
     "lucide-react": "^0.408.0",
+    "mime-types": "^2.1.35",
     "mongodb": "^6.8.0",
     "mongoose": "^7.7.0",
+    "multiparty": "^4.2.3",
     "next": "14.2.5",
     "next-auth": "^4.22.1",
     "react": "18.3.1",
@@ -30,6 +34,8 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/mime-types": "^2.1.4",
+    "@types/multiparty": "^0.0.36",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4"

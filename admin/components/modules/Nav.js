@@ -4,6 +4,7 @@ import {
   ShoppingBasket,
   Logs,
   Settings,
+  Layers3
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -38,6 +39,15 @@ const Nav = () => {
         >
           <ShoppingBasket />
           <span>Products</span>
+        </Link>
+        <Link
+          href="/categories"
+          className={
+            pathname.includes("/categories") ? inActiveLink : acticeLink
+          }
+        >
+          <Layers3 />
+          <span>Categories</span>
         </Link>
         <Link
           href="/orders"
