@@ -8,5 +8,8 @@ export default async function hanle(req, res) {
     const { name } = req.body;
     const categoryAdd = await Category.create({ name });
     res.json({ message: "success", data: categoryAdd });
+  } else if (method === "GET") {
+    const categorys = await Category.find();
+    res.json({ message: "success", data: categorys });
   }
 }
