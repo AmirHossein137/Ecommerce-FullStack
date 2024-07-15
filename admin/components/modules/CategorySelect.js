@@ -3,26 +3,31 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-export default function CategorySelect() {
+export default function CategorySelect({
+  categories,
+  parentCategory,
+  setParentCategory,
+}) {
+  
+
   return (
-    <Select>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Select a fruit" />
+    <Select value={parentCategory} onValueChange={setParentCategory}>
+      <SelectTrigger className="w-[350px]">
+        <SelectValue placeholder="Select Your Category" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-          <SelectItem value="blueberry">Blueberry</SelectItem>
-          <SelectItem value="grapes">Grapes</SelectItem>
-          <SelectItem value="pineapple">Pineapple</SelectItem>
+          <SelectItem value="0">No Parent Category</SelectItem>
+          {categories.length > 0 &&
+            categories.map((category) => (
+              <SelectItem key={category._id} value={category._id}>{category.name}</SelectItem>
+            ))}
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }

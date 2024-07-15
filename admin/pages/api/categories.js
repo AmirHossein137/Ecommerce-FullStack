@@ -5,8 +5,8 @@ export default async function hanle(req, res) {
   await connectDB();
   const { method } = req;
   if (method === "POST") {
-    const { name } = req.body;
-    const categoryAdd = await Category.create({ name });
+    const { name, parentCategory } = req.body;
+    const categoryAdd = await Category.create({ name, parent: parentCategory || undefined });
     res.json({ message: "success", data: categoryAdd });
   } else if (method === "GET") {
     const categorys = await Category.find();
