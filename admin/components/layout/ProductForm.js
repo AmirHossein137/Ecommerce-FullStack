@@ -2,34 +2,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/router";
+import ProductSelect from "../modules/ProductSelect";
 
 const ProductForm = ({
   _id,
   title: existTitle,
   description: existDescription,
   price: existPrice,
+  category : existCategory
 }) => {
   const [title, setTitle] = useState(existTitle || "");
   const [description, setDescription] = useState(existDescription || "");
   const [price, setPrice] = useState(existPrice || "");
+  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState(existCategory || "");
+
   const router = useRouter();
 
   const createProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price };
+    const data = { title, description, price , category};
     if (_id) {
       await axios.put("/api/products/", { ...data, _id });
-        router.push("/products");
+      router.push("/products");
     } else {
       await axios.post("/api/products", data);
       router.push("/products");
     }
   };
 
+  useEffect(() => {
+    axios
+      .get("/api/categories")
+      .then((result) => setCategories(result.data.data));
+  }, []);
 
   return (
     <div>
@@ -48,6 +58,16 @@ const ProductForm = ({
             onChange={(e) => setTitle(e.target.value)}
             className="border-gray-300"
             placeholder="Product Name..."
+          />
+        </div>
+        <div className="flex flex-col w-full max-w-sm gap-3">
+          <span className="text-slate-900 font-medium text-sm">
+            Product Category :
+          </span>
+          <ProductSelect
+            categories={categories}
+            category={category}
+            setCategory={setCategory}
           />
         </div>
         <div className="flex flex-col w-full max-w-sm gap-3">

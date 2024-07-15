@@ -5,11 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
+import { withSwal } from 'react-sweetalert2';
 
-const Categories = () => {
+const Categories = ({ swal }) => {
   const [name, setName] = useState();
   const [categories, setCategories] = useState([]);
   const [parentCategory, setParentCategory] = useState("");
+  const [editCategory, setEditCategory] = useState(null);
 
   const fetchCategory = async () => {
     const res = await fetch("/api/categories");
@@ -20,17 +22,59 @@ const Categories = () => {
 
   const saveCategoryHandler = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/categories", {
-      method: "POST",
-      body: JSON.stringify({ name , parentCategory }),
-      headers: { "Content-Type": "application/json" },
-    });
-    const result = await res.json();
-    if (result.message) {
-      toast.success(`${result.data.name} Added`);
-      setName("");
-      fetchCategory();
+    const data = { name, parentCategory };
+    if (editCategory) {
+      const res = await fetch("/api/categories", {
+        method: "PUT",
+        body: JSON.stringify({ ...data, _id: editCategory._id }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result.message) {
+        setName("");
+        setEditCategory(null);
+        fetchCategory();
+      }
+    } else {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result.message) {
+        toast.success(`${result.data.name} Added`);
+        fetchCategory();
+      }
     }
+  };
+
+  const EditCategoryHandler = (cat) => {
+    setEditCategory(cat);
+    setName(cat.name);
+    setParentCategory(cat.parent?._id);
+  };
+
+  const deleteCategory = (cat) => {
+    swal
+      .fire({
+        title: "Are you sure?",
+        text: `Do you want to delete ${cat.name}?`,
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        confirmButtonText: "Yes, Delete!",
+        confirmButtonColor: "#d55",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          const { _id } = cat;
+          await fetch("/api/categories?_id=" + _id , {
+            method : "DELETE"
+          })
+          fetchCategory();
+        }
+      });
   };
 
   useEffect(() => {
@@ -39,7 +83,9 @@ const Categories = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Categories</h1>
+      <h1 className="text-2xl font-bold text-slate-800 mb-6">
+        {editCategory ? "Edit Categories" : "Create New Category"}
+      </h1>
       <form onSubmit={saveCategoryHandler} className="mb-7">
         <div className="flex flex-col w-full max-w-3xl gap-3">
           <Label htmlFor="catname" className="text-slate-900 font-medium">
@@ -67,7 +113,11 @@ const Categories = () => {
           <h1 className="mb-5 text-slate-900 tex-2xl font-bold">
             Category Lists :
           </h1>
-          <CategoryTable categories={categories} />
+          <CategoryTable
+            categories={categories}
+            EditCategoryHandler={EditCategoryHandler}
+            deleteCategory={deleteCategory}
+          />
         </div>
       </div>
       <Toaster />
@@ -75,4 +125,4 @@ const Categories = () => {
   );
 };
 
-export default Categories;
+export default withSwal(({ swal }, ref) => <Categories swal={swal} />);
