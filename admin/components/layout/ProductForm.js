@@ -13,19 +13,29 @@ const ProductForm = ({
   title: existTitle,
   description: existDescription,
   price: existPrice,
-  category : existCategory
+  category: existCategory,
+  properties: existpropertiesValue,
 }) => {
   const [title, setTitle] = useState(existTitle || "");
   const [description, setDescription] = useState(existDescription || "");
   const [price, setPrice] = useState(existPrice || "");
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState(existCategory || "");
+  const [propertiesValue, setPropertiesValue] = useState(
+    existpropertiesValue || {}
+  );
 
   const router = useRouter();
 
   const createProduct = async (e) => {
     e.preventDefault();
-    const data = { title, description, price , category};
+    const data = {
+      title,
+      description,
+      price,
+      category,
+      properties: propertiesValue,
+    };
     if (_id) {
       await axios.put("/api/products/", { ...data, _id });
       router.push("/products");
@@ -34,6 +44,29 @@ const ProductForm = ({
       router.push("/products");
     }
   };
+
+  const propertiesToFill = [];
+  if (categories.length > 0 && category) {
+    let catInfo = categories.find(({ _id }) => _id === category);
+    propertiesToFill.push(...catInfo.properties);
+    while (catInfo?.parent?._id) {
+      const parentCat = categories.find(
+        ({ _id }) => _id === catInfo?.parent?._id
+      );
+      propertiesToFill.push(...parentCat.properties);
+      catInfo = parentCat;
+    }
+  }
+
+  const productProp = (propname, value) => {
+    setPropertiesValue((prev) => {
+      const newprop = { ...prev };
+      newprop[propname] = value;
+      return newprop;
+    });
+  };
+
+  console.log(propertiesValue);
 
   useEffect(() => {
     axios
@@ -69,6 +102,29 @@ const ProductForm = ({
             category={category}
             setCategory={setCategory}
           />
+        </div>
+        <div>
+          <div className="w-full max-w-sm">
+            {propertiesToFill &&
+              propertiesToFill.map((item) => (
+                <div className="flex flex-col gap-2 mb-2">
+                  <div>{item.name}</div>
+                  <div>
+                    <select
+                      value={propertiesValue[item.name]}
+                      onChange={(e) => productProp(item.name, e.target.value)}
+                      className="w-full px-[14px] bg-transparent border border-gray-200 rounded-md h-[40px]"
+                    >
+                      {item.value.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
         <div className="flex flex-col w-full max-w-sm gap-3">
           <Label htmlFor="price" className="text-slate-900 font-medium">

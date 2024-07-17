@@ -14,6 +14,7 @@ const EditPage = () => {
     }
     axios.get("/api/products?id=" + id).then((response) => {
       setProductInfo(response.data);
+      console.log(productInfo)
     });
   }, [id]);
   return <div>{productInfo && <ProductForm {...productInfo} />}</div>;

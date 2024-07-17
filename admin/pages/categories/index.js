@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import { withSwal } from 'react-sweetalert2';
+import { withSwal } from "react-sweetalert2";
+import axios from "axios";
 
 const Categories = ({ swal }) => {
   const [name, setName] = useState();
   const [categories, setCategories] = useState([]);
   const [parentCategory, setParentCategory] = useState("");
   const [editCategory, setEditCategory] = useState(null);
+  const [properties, setProperties] = useState([]);
 
   const fetchCategory = async () => {
     const res = await fetch("/api/categories");
@@ -22,37 +24,40 @@ const Categories = ({ swal }) => {
 
   const saveCategoryHandler = async (e) => {
     e.preventDefault();
-    const data = { name, parentCategory };
+    const data = {
+      name,
+      parentCategory,
+      properties: properties.map((p) => ({
+        name: p.name,
+        value: p.value.split(","),
+      })),
+    };
     if (editCategory) {
-      const res = await fetch("/api/categories", {
-        method: "PUT",
-        body: JSON.stringify({ ...data, _id: editCategory._id }),
-        headers: { "Content-Type": "application/json" },
-      });
-      const result = await res.json();
-      if (result.message) {
-        setName("");
-        setEditCategory(null);
-        fetchCategory();
-      }
+      data._id = editCategory._id;
+      await axios.put("/api/categories", data);
+      setEditCategory(null);
+      fetchCategory();
+      setName("");
     } else {
-      const res = await fetch("/api/categories", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" },
-      });
-      const result = await res.json();
-      if (result.message) {
-        toast.success(`${result.data.name} Added`);
-        fetchCategory();
-      }
+      await axios.post("/api/categories", data);
+      setName("");
+      setParentCategory("");
+      setProperties([]);
+      fetchCategory();
     }
   };
 
   const EditCategoryHandler = (cat) => {
+    console.log(cat);
     setEditCategory(cat);
     setName(cat.name);
     setParentCategory(cat.parent?._id);
+    setProperties(
+      cat.properties.map(({ name, value }) => ({
+        name,
+        value: value.join(","),
+      }))
+    );
   };
 
   const deleteCategory = (cat) => {
@@ -69,12 +74,43 @@ const Categories = ({ swal }) => {
       .then(async (result) => {
         if (result.isConfirmed) {
           const { _id } = cat;
-          await fetch("/api/categories?_id=" + _id , {
-            method : "DELETE"
-          })
+          await fetch("/api/categories?_id=" + _id, {
+            method: "DELETE",
+          });
           fetchCategory();
         }
       });
+  };
+
+  const addPropertiesHandler = () => {
+    setProperties((prev) => {
+      return [...prev, { name: "", value: "" }];
+    });
+  };
+
+  const nameChangeHandler = (index, property, newName) => {
+    console.log({ index, property, newName });
+    setProperties((prev) => {
+      const properties = [...prev];
+      properties[index].name = newName;
+      return properties;
+    });
+  };
+
+  const valueChangeHandler = (index, property, newValue) => {
+    setProperties((prev) => {
+      const properties = [...prev];
+      properties[index].value = newValue;
+      return properties;
+    });
+  };
+
+  const propertyDeleteHandler = (index) => {
+    setProperties((prev) => {
+      const properties = [...prev];
+      properties.splice(index, 1);
+      return properties;
+    });
   };
 
   useEffect(() => {
@@ -104,8 +140,48 @@ const Categories = ({ swal }) => {
               parentCategory={parentCategory}
               setParentCategory={setParentCategory}
             />
-            <Button type="submit">Save</Button>
           </div>
+          <div>
+            <p className="text-lg mb-3 text-slate-800 font-medium">
+              Properties
+            </p>
+            <Button onClick={addPropertiesHandler} type="button">
+              Add Properties
+            </Button>
+            <div className="flex flex-col w-full max-w-3xl gap-3">
+              {properties.length > 0 &&
+                properties?.map((property, index) => (
+                  <div className="flex items-center gap-2 mt-3">
+                    <Input
+                      type="text"
+                      value={property.name}
+                      placeholder="Property Name... "
+                      onChange={(e) =>
+                        nameChangeHandler(index, property, e.target.value)
+                      }
+                    />
+                    <Input
+                      type="text"
+                      value={property.value}
+                      placeholder="Property Value... "
+                      onChange={(e) =>
+                        valueChangeHandler(index, property, e.target.value)
+                      }
+                    />
+                    <Button
+                      variant="destructive"
+                      type="button"
+                      onClick={() => propertyDeleteHandler(index)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                ))}
+            </div>
+          </div>
+          <Button type="submit" className="bg-green-700 font-bold">
+            Save
+          </Button>
         </div>
       </form>
       <div>
