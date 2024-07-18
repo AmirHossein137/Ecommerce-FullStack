@@ -21,7 +21,11 @@ const Cart = () => {
     return filtered;
   };
 
-  console.log(cartItems);
+  let total = 0;
+  for (const productId of cartProducts) {
+    const price = cartItems.find((element) => element._id === productId)?.price || 0;
+    total += price;
+  }
 
   useEffect(() => {
     fetchproduct();
@@ -37,12 +41,9 @@ const Cart = () => {
         </div>
       )}
       <div>
-        {cartItems.length > 0 &&
-          cartItems.map((cart) => (
-            <div key={cart._id}>
-             <CartTable />
-            </div>
-          ))}
+        <div>
+          <CartTable total={total} cartItems={cartItems} productCount={productCount} />
+        </div>
       </div>
     </div>
   );
