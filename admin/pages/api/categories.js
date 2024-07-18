@@ -1,9 +1,13 @@
 import { Category } from "@/models/Category";
 import connectDB from "@/utils/connectDB";
+import { isAdminRequest } from "./auth/[...nextauth]";
 
 export default async function hanle(req, res) {
   await connectDB();
+  await isAdminRequest(req, res);
+
   const { method } = req;
+
   if (method === "POST") {
     const { name, parentCategory, properties } = req.body;
     const categoryAdd = await Category.create({

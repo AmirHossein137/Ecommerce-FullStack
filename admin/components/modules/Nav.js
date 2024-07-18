@@ -4,17 +4,24 @@ import {
   ShoppingBasket,
   Logs,
   Settings,
-  Layers3
+  Layers3,
+  LogOut,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 const Nav = () => {
   const acticeLink = "flex items-center gap-1 p-2";
-  const inActiveLink = acticeLink + " bg-white text-slate-900 rounded-l-lg font-medium";
+  const inActiveLink =
+    acticeLink + " bg-white text-slate-900 rounded-l-lg font-medium";
 
   const router = useRouter();
   const { pathname } = router;
+
+  const logoutHandler = () => {
+    signOut();
+  };
   return (
     <aside className="p-5 pr-0 text-white">
       <Link href="/" className="flex items-center gap-1 mb-5 mr-7">
@@ -33,9 +40,7 @@ const Nav = () => {
         </Link>
         <Link
           href="/products"
-          className={
-            pathname.includes("/products") ? inActiveLink : acticeLink
-          }
+          className={pathname.includes("/products") ? inActiveLink : acticeLink}
         >
           <ShoppingBasket />
           <span>Products</span>
@@ -51,22 +56,22 @@ const Nav = () => {
         </Link>
         <Link
           href="/orders"
-          className={
-            pathname.includes("/orders") ? inActiveLink : acticeLink
-          }
+          className={pathname.includes("/orders") ? inActiveLink : acticeLink}
         >
           <Logs />
           <span>Orders</span>
         </Link>
         <Link
           href="/settings"
-          className={
-            pathname.includes("/settings") ? inActiveLink : acticeLink
-          }
+          className={pathname.includes("/settings") ? inActiveLink : acticeLink}
         >
           <Settings />
           <span>Settings</span>
         </Link>
+        <button onClick={logoutHandler} className="flex items-center gap-1 p-2">
+          <LogOut />
+          LogOut
+        </button>
       </nav>
     </aside>
   );
